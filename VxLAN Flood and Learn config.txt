@@ -1,0 +1,111 @@
+VxLAN Flood and Learn
+
+https://www.cisco.com/c/en/us/td/docs/switches/datacenter/sw/nx-os/vxlan/configuration/guide/b_NX-OS_VXLAN_Configuration_Guide/configuring-vxlan-flood-and-learn.html
+
+
+hostname N9K01
+!
+feature pim 
+feature eigrp
+feature interface-vlan
+feature hsrp
+feature vn-segment-vlan-based
+feature nv overlay
+!
+ip pim rp-address 192.168.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+!
+vlan 10
+name VxLAN
+vn-segment 100010
+!
+interface Vlan 10
+no shut
+ip address 10.0.0.250/24
+ip pim sparse-mode
+hsrp 10
+  ip 10.0.0.254
+!
+interface nve1
+source-interface loopback0
+member vni 100010
+mcast-group 224.1.1.1
+!
+interface Ethernet1/1
+switchport access vlan 10
+spanning-tre port type edge
+!
+interface Ethernet1/2
+no switchport
+ip address 10.0.1.2/24
+ip router eigrp VxLAN
+ip pim sparse-mode
+!
+interface loopback0
+ip address 192.168.1.1/32
+ip router eigrp VxLAN
+ip pim sparse-mode
+ip igmp join-group 224.1.1.1
+!
+router eigrp VxLAN
+address-family ipv4 unicast
+autonomous-system 1
+!
+
+##########################################################
+
+hostname N9K02
+!
+feature pim 
+feature eigrp
+feature interface-vlan
+feature hsrp
+feature vn-segment-vlan-based
+feature nv overlay
+!
+ip pim rp-address 192.168.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+!
+vlan 10
+name VxLAN
+!
+interface Vlan 10
+no shut
+ip address 10.0.0.251/24
+ip pim sparse-mode
+hsrp 10
+  ip 10.0.0.254
+!
+interface nve1
+source-interface loopback0
+member vni 100010
+mcast-group 224.1.1.1
+!
+interface Ethernet1/1
+switchport access vlan 10
+spanning-tre port type edge
+!
+interface Ethernet1/2
+no switchport
+ip address 10.0.1.3/24
+ip router eigrp VxLAN
+ip pim sparse-mode
+!
+interface loopback0
+ip address 192.168.1.2/32
+ip router eigrp VxLAN
+ip pim sparse-mode
+ip igmp join-group 224.1.1.1
+!
+router eigrp VxLAN
+address-family ipv4 unicast
+autonomous-system 1
+!
+
+
+!!! Show Commands !!!
+show nve 1
+show nve peer
+show nve vni 
+show vxlan
+show vxlan interface

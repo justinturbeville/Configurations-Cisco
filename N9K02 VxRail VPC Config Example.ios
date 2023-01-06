@@ -1,0 +1,235 @@
+version 9.3(9) Bios:version 05.45
+
+cfs eth distribute
+feature interface-vlan
+feature hsrp
+feature lacp
+feature dhcp
+feature vpc
+feature lldp
+feature vtp
+
+vlan 1,3101-3103,3105,3106,3110,3939
+vlan 3101
+  name DCX_OOB_MGMT
+vlan 3102
+  name DCX_IB_MGMT
+vlan 3103
+  name DCX_Infra_MGMT
+vlan 3105
+  name DCX_vSphere_MGMT
+vlan 3106
+  name DCX_vMotion
+vlan 3110
+  name DCX_VSAN
+vlan 3939
+  name VxRail_Internal
+
+spanning-tree vlan 1-3967 priority 16384
+service dhcp
+ip dhcp relay
+ipv6 dhcp relay
+vrf context management
+vpc domain 70
+  peer-switch
+  peer-keepalive destination 10.255.255.9 source 10.255.255.10
+  delay restore 150
+  peer-gateway
+  layer3 peer-router
+  auto-recovery
+  ip arp synchronize
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan3101
+  description DCX_OOB_MGMT
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 10.X.101.3/24
+  no ipv6 redirects
+  hsrp version 2
+  hsrp 3101
+    authentication md5 key-string XXXXXXXX
+    preempt
+    ip 10.X.101.1
+
+interface Vlan3102
+  description DCX_IB_MGMT
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 10.X.102.3/24
+  no ipv6 redirects
+  hsrp version 2
+  hsrp 3102
+    authentication md5 key-string XXXXXXXX
+    preempt
+    ip 10.X.102.1
+
+interface Vlan3103
+  description DCX_Infra_MGMT
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 10.X.103.3/24
+  no ipv6 redirects
+  hsrp version 2
+  hsrp 3103
+    authentication md5 key-string XXXXXXXX
+    preempt
+    ip 10.X.103.1
+
+interface Vlan3105
+  description DCX_vSphere_MGMT
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 10.X.105.3/24
+  no ipv6 redirects
+  hsrp version 2
+  hsrp 3105
+    authentication md5 key-string XXXXXXXX
+    preempt
+    ip 10.X.105.1
+
+interface Vlan3939
+  no shutdown
+  no ip redirects
+  no ipv6 redirects
+
+interface port-channel100
+  description Peer-link
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface Ethernet1/1
+  description VxRail Node 1
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/2
+  description VxRail Node 1
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/3
+  description VxRail Node 1
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/4
+  description VxRail Node 1
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/5
+  description VxRail Node 2
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/6
+  description VxRail Node 2
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/7
+  description VxRail Node 2
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/8
+  description VxRail Node 2
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/9
+  description VxRail Node 3
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/10
+  description VxRail Node 3
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/11
+  description VxRail Node 3
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/12
+  description VxRail Node 3
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/13
+  description VxRail Node 4
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/14
+  description VxRail Node 4
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/15
+  description VxRail Node 4
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/16
+  description VxRail Node 4
+  switchport mode trunk
+  switchport trunk native vlan 3105
+  mtu 9216
+  no shutdown
+
+interface Ethernet1/53
+  description Peer-link
+  switchport mode trunk
+  channel-group 100 mode active
+  no shutdown
+
+interface Ethernet1/54
+  description Peer-link
+  switchport mode trunk
+  channel-group 100 mode active
+  no shutdown
+
+interface mgmt0
+  vrf member management
+  ip address 10.255.255.10/30

@@ -1,0 +1,15 @@
+*****************************************************************************
+*                                                                           *
+*         WARNING: Unauthorized access to this system is prohibited.        *
+*                                                                           *
+* Only authorized personnel are permitted access to this system. Authorized *
+* personnel are permitted only to perform official work on this system. All *
+* logins, login attempts, and usage of this system may be monitored/logged. *
+* As such there is to be no expectation of privacy when using this device   *
+* in any capacity.                                                          *
+*                                                                           *
+* Unauthorized attempts and actions to access or use this system may result *
+* in civil and/or criminal penalties. The use of this system implies        *
+* acceptance of all the conditions listed above.                            *
+*                                                                           *
+*****************************************************************************

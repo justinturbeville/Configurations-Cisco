@@ -1,0 +1,95 @@
+enable
+configure terminal
+!
+service timestamps log datetime localtime show-timezone
+service timestamps debug datetime msec 
+service password-encryption
+service sequence-numbers
+!
+hostname ####
+!
+enable secret 9 ####
+!
+!aaa new-model
+clock timezone EST -5 0
+clock summer-time EDT recurring
+!
+ip routing
+!
+no ip domain lookup
+ip domain name ####
+!
+vtp mode off
+!
+system mtu 9198
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority ####
+!
+username #### privilege 15 secret 9 ####
+!
+vlan ####
+name ####
+!
+lldp timer 10
+lldp run
+cdp timer 10
+cdp run
+!
+interface vlan ####
+ip address ####
+description ####
+!
+no ip http server
+no ip http server-secure
+ip ssh logging events
+ip ssh version 2
+ip ssh time-out 120
+ip ssh source-interface ####
+!
+logging trap debugging
+logging origin-id hostname
+logging host ####
+!
+snmp-server community #### ro
+snmp-server location ####
+snmp-server contact ####
+snmp-server source-interface ####
+!
+banner login ^
+*****************************************************************************
+*                                                                           *
+*         WARNING: Unauthorized access to this system is prohibited.        *
+*                                                                           *
+* Only authorized personnel are permitted access to this system. Authorized *
+* personnel are permitted only to perform official work on this system. All *
+* logins, login attempts, and usage of this system may be monitored/logged. *
+* As such there is to be no expectation of privacy when using this device   *
+* in any capacity.                                                          *
+*                                                                           *
+* Unauthorized attempts and actions to access or use this system may result *
+* in civil and/or criminal penalties. The use of this system implies        *
+* acceptance of all the conditions listed above.                            *
+*                                                                           *
+*****************************************************************************
+^
+!
+line con 0
+session-timeout 300
+timeout login response 300
+logging synchronous
+login local
+line vty 0 15
+login local 
+transport input ssh 
+!
+ntp server #### source vlan ####
+!
+!
+!
+ip ftp username ####
+ip ftp password ####
+ip ftp soure-interface ####
+!
+crypto key generate rsa general-keys modulus 4096
