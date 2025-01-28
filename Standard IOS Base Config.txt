@@ -1,23 +1,45 @@
 enable
-configure terminal
+conf terminal
 !
 service timestamps log datetime localtime show-timezone
 service timestamps debug datetime msec 
 service password-encryption
 service sequence-numbers
 !
-hostname ####
+hostname [HOSTNAME]
 !
-enable secret 9 ####
+aaa new-model
+aaa group server tacacs+ [AAASERVER]
+ server-private 192.0.2.11 key [TACACSSECRET]
+ server-private 192.0.2.12 key [TACACSSECRET]
+aaa authentication login default group [AAASERVER] local
+aaa authorization exec default group [AAASERVER] local
 !
-!aaa new-model
+ip tacacs source-interface loopback 0
+!
+ip radius source-interface Loopback0
+!
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+!
+dot1x system-auth-control
+!
+radius server [RADIUSSERVER]
+ address ipv4 192.0.2.11 auth-port 1812 acct-port 1813
+ key [RADIUSSECRET]
+!
+radius server [RADIUSSERVER]
+ address ipv4 192.0.2.12 auth-port 1812 acct-port 1813
+ key [RADIUSSECRET]
+!
 clock timezone EST -5 0
 clock summer-time EDT recurring
 !
 ip routing
 !
-no ip domain lookup
-ip domain name ####
+ip domain lookup
+ip domain name eigrp.org
+ip name 192.0.2.21 192.0.2.22
 !
 vtp mode off
 !
@@ -25,37 +47,53 @@ system mtu 9198
 !
 spanning-tree mode rapid-pvst
 spanning-tree extend system-id
-spanning-tree vlan 1-4094 priority ####
+spanning-tree vlan 1-4094 priority 16384
 !
-username #### privilege 15 secret 9 ####
+username cisco privilege 15 secret 9 [SOMEHASH]
 !
-vlan ####
-name ####
+vlan 10
+name DATA 
+vlan 20
+name VOICE
+exit
+!
+inter vlan 10
+ip address 10.0.10.1 255.255.255.0
+ip helper-address 192.0.2.31
+ip helper-address 192.0.2.32
+description DATA
+!
+inter vlan 20
+ip address 10.0.20.1 255.255.255.0
+ip helper-address 192.0.2.31
+ip helper-address 192.0.2.32
+description VOICE
+!
+interface loopback 0
+ip address 10.0.255.1 255.255.255.255
+description LOOPBACK
+!
+exit
 !
 lldp timer 10
 lldp run
 cdp timer 10
 cdp run
 !
-interface vlan ####
-ip address ####
-description ####
-!
 no ip http server
-no ip http server-secure
-ip ssh logging events
-ip ssh version 2
-ip ssh time-out 120
-ip ssh source-interface ####
+no ip http authentication
+no ip http secure-server
 !
-logging trap debugging
+logging trap informational
+logging source-interface loop0
 logging origin-id hostname
-logging host ####
+logging host 192.0.2.41 transport tcp port 5555
 !
-snmp-server community #### ro
-snmp-server location ####
-snmp-server contact ####
-snmp-server source-interface ####
+snmp-server community [SNMPSTRING] ro
+snmp-server location [SNMPLOCATION]
+snmp-server contact [SNMPLOCATION]
+snmp-server source-interface informs loopback 0
+snmp-server source-interface traps loopback 0
 !
 banner login ^
 *****************************************************************************
@@ -75,21 +113,62 @@ banner login ^
 *****************************************************************************
 ^
 !
+ip access-list standard MANAGEMENT_VTY_ACL
+ permit 192.0.2.200 
+ permit 192.0.2.0 0.0.0.255
+!
 line con 0
 session-timeout 300
 timeout login response 300
 logging synchronous
-login local
 line vty 0 15
-login local 
+access-class MANAGEMENT_VTY_ACL in
+exec-timeout 5
+logging synchronous
 transport input ssh 
 !
-ntp server #### source vlan ####
+ntp server time.eigrp.org source loop 0
 !
-!
-!
-ip ftp username ####
-ip ftp password ####
-ip ftp soure-interface ####
+netconf ssh
+netconf-yang
 !
 crypto key generate rsa general-keys modulus 4096
+!
+ip ssh logging events
+ip ssh version 2
+ip ssh time-out 120
+ip ssh source-interface loopback 0
+!
+ip route 0.0.0.0 0.0.0.0 192.0.2.1
+!
+archive 
+log config
+logging enable
+logging size 1000
+notify syslog
+hidekeys
+!
+!
+ description 802.1x_DATA
+ switchport mode access
+ switchport nonegotiate
+ authentication event fail action next-method
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate 20
+ authentication timer restart 20
+ mab
+ dot1x pae authenticator
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+ ip nbar protocol-discovery
+ dot1x max-req 4
+ dot1x max-reauth-req 5
+ authentication violation replace
+ no logging event link-status
+ load-interval 60
+!
