@@ -1,0 +1,38 @@
+ip radius source-interface Loopback0
+!
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+!
+dot1x system-auth-control
+!
+radius server [RADIUSSERVER]
+ address ipv4 192.0.2.11 auth-port 1812 acct-port 1813
+ key [RADIUSSECRET]
+!
+radius server [RADIUSSERVER]
+ address ipv4 192.0.2.12 auth-port 1812 acct-port 1813
+ key [RADIUSSECRET]
+!
+ description 802.1x_DATA
+ switchport mode access
+ switchport nonegotiate
+ authentication event fail action next-method
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate 20
+ authentication timer restart 20
+ mab
+ dot1x pae authenticator
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ spanning-tree guard root
+ ip nbar protocol-discovery
+ dot1x max-req 4
+ dot1x max-reauth-req 5
+ authentication violation replace
+ no logging event link-status
+ load-interval 60
+!
